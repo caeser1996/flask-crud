@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+<body>
+<!--Add-->
+<!--List-->
+<!--Edit-->
+<!--Delete-->
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 mt-4">
+            <button type="button" class="btn btn-primary" id="addUser">Add a user</button>
+        </div>
+        <div class="col-md-12 mt-3">
+            <div class="card">
+                <div class="card-header">
+                    Users
+                </div>
+                <ul class="list-group list-group-flush mr-3" id="usersList" style="list-style-type: none;">
+
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add User</h5>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label for="">Name</label>
+                            <input type="text" class="form-control" placeholder="Name" aria-label="name"
+                                   aria-describedby="basic-addon1" id="name">
+                        </div>
+                        <div class="col-md-12">
+                            <label for="">Email</label>
+                            <input type="text" class="form-control" placeholder="email" aria-label="email"
+                                   aria-describedby="basic-addon1" id="email">
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveUser">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="addModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Edit User <span id="editUser_id"></span></h5>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label for="">Name</label>
+                            <input type="text" class="form-control" placeholder="Name" aria-label="edit_name"
+                                   aria-describedby="basic-addon1" id="edit_name">
+                        </div>
+                        <div class="col-md-12">
+                            <label for="">Email</label>
+                            <input type="text" class="form-control" placeholder="email" aria-label="edit_email"
+                                   aria-describedby="basic-addon1" id="edit_email">
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="updat_user">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"-->
+<!--        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"-->
+<!--        crossorigin="anonymous"></script>-->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+<script>
+    //     <!--Add-->
+    // <!--List-->
+    // <!--Edit-->
+    // <!--Delete-->
+    $(document).ready(function () {
+        // Add a user Modal
+        $("#addUser").on("click", function () {
+            $("#addModal").modal("show");
+        })
+
+        //Read
+        function loadUsers() {
+            var settings = {
+                "url": "http://127.0.0.1:5000/get-users",
+                "method": "GET",
+                "timeout": 0,
+            };
+
+            $.ajax(settings).done(function (response) {
+                let resp = JSON.parse(response)
+                $('#usersList').empty()
+      
+                resp.map((v, k) => {
+                    $('#usersList').append("<li class='list-group-item'>Name : " + v.name + " , Email : " + v.email + "   <button class='btn btn-warning edit_user' data-user_id=" + v._id.$oid + ">Edit</button> <button class='btn btn-danger delete_user' data-user_id=" + v._id.$oid + ">Delete</button></li>")
+                })
+            });
+        }
+
+        //Create
+        $("#saveUser").on("click", function () {
+            let name = $("#name").val()
+            let email = $("#email").val()
+
+            if (name == "" || email == "") {
+                alert("please enter all the values")
+                return
+            } else {
+                let data = {
+                    "name": name,
+                    "email": email
+                }
+                var settings = {
+                    "url": "http://127.0.0.1:5000/create",
+                    "method": "POST",
+                    "timeout": 0,
+                    "headers": {
+                        "Content-Type": "application/json"
+                    },
+                    "data": JSON.stringify(data),
+                };
+
+                $.ajax(settings).done(function (response) {
+                    $("#addModal").modal("hide");
+                    loadUsers()
+                    alert("User Saved")
+
+                });
+            }
+        })
+        //Delete
+        $(document).on("click", ".delete_user", function () {
+            // alert("click delete")
+            let user_id = $(this).attr("data-user_id")
+            var settings = {
+                "url": "http://127.0.0.1:5000/delete-user/" + user_id,
+                "method": "DELETE",
+                "timeout": 0,
+            };
+
+            $.ajax(settings).done(function (response) {
+                alert("user delete successfully")
+                loadUsers()
+                // console.log(response);
+            });
+            console.log(user_id)
+        })
+        $(document).on("click", ".edit_user", function () {
+            $("#editUser_id").text("")
+            $("#edit_email").val("")
+            $("#edit_name").val("")
+            // alert("click delete")
+            let user_id = $(this).attr("data-user_id")
+            var settings = {
+                "url": "http://127.0.0.1:5000/get-user/" + user_id,
+                "method": "GET",
+                "timeout": 0,
+            };
+
+            $.ajax(settings).done(function (response) {
+                let resp = JSON.parse(response)
+                console.log(resp[0]._id.$oid)
+                $("#editModal").modal("show")
+                $("#editUser_id").text(resp[0]._id.$oid)
+                $("#edit_email").val(resp[0].email)
+                $("#edit_name").val(resp[0].name)
+
+
+            });
+
+        })
+
+        $("#updat_user").on("click", function () {
+            let name = $("#edit_name").val()
+            let email = $("#edit_email").val()
+            let _id = $("#editUser_id").text()
+
+            if (name == "" || email == "") {
+                alert("please enter all the values")
+                return
+            } else {
+                let data = {
+                    "name": name,
+                    "email": email,
+                    "_id": _id
+                }
+                var settings = {
+                    "url": "http://127.0.0.1:5000/update-user",
+                    "method": "PUT",
+                    "timeout": 0,
+                    "headers": {
+                        "Content-Type": "application/json"
+                    },
+                    "data": JSON.stringify(data),
+                };
+
+                $.ajax(settings).done(function (response) {
+                    console.log(response);
+                    $("#editModal").modal("hide");
+                    alert("data updated")
+                    loadUsers()
+                });
+            }
+        })
+        loadUsers()
+    })
+
+</script>
+</body>
+</html>
